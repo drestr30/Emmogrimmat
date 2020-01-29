@@ -91,15 +91,16 @@ def filterImages(images):
     return np.expand_dims(fil_img, axis=2)
 
 def plotImages(batch_data, n_images=(4, 4)):
+    fer_labels = ["angry", "disgust", "scared", "happy", "sad", "surprised", "neutral"]
     fig, axes = plt.subplots(n_images[0], n_images[1], figsize=(12, 12))
     axes = axes.flatten()
     images = batch_data[0]
     for n, ax in zip(range(16), axes):
         img = images[n, :, :, :]
-        ax.imshow(np.squeeze(img, axis=2), cmap='gray', vmin=-1, vmax=1)
+        ax.imshow(img, cmap='gray', vmin=-1, vmax=1)
         ax.set_xticks(())
         ax.set_yticks(())
-        ax.set_title(batch_data[1][n])
+        ax.set_title(fer_labels[np.argmax(batch_data[1][n])])
     plt.tight_layout()
     plt.show()
 
@@ -157,6 +158,7 @@ def load_raf(gray=False, test=False):
     with open(dataset_path + 'RAFalinied/list_patition_label.txt') as label_data:
         for image_path, label_line in zip(data, label_data):
             face = cv2.imread(dataset_path + raf_path + image_path)
+            # face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
             if gray:
                 face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
                 face = cv2.resize(face, image_size)
@@ -200,20 +202,22 @@ def preprocess_input(x, v2=True):
         x = x * 2.0
     return x
 
-# faces, emotions = load_fer2013()
+faces, emotions = load_fer2013()
+# plt.imshow(faces[0,:,:,:])
+# plt.show()
 # faces, emotions = balance(un_faces, un_emotions, 5000)
+#
+# faces, emotions, xtest, ytest = load_raf(gray=True, test= True)
 
-faces, emotions, xtest, ytest = load_raf(gray=True, test= True)
-
-emotions = fix_labels(emotions)
-ytest = fix_labels(ytest)
+# emotions = fix_labels(emotions)
+# ytest = fix_labels(ytest)
 
 # values, counts = np.unique(emotions, return_counts=True)
 # for v,c in zip(values,counts):
 #     print('value: %s, counts: %s'%(v,c))
 
 faces, emotions = balance(faces, emotions, 1000)
-xtest, ytest = balance(xtest, ytest, 100)
+# xtest, ytest = balance(xtest, ytest, 100)
 
 # filtered_image = filterImages(faces)
 # procesed_faces = preprocess_input(faces)

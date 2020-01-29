@@ -34,11 +34,11 @@ class Detection:
 
         confidence = detections[0, 0, 1, 2]
 
-        print("confidence: {:.2f}%".format(confidence.any() * 100))
+        # print("confidence: {:.2f}%".format(confidence.any() * 100))
 
         # filter out weak detections by ensuring the `confidence` is
         # greater than the minimum confidence
-        if confidence < 0.85:
+        if confidence < 0.99:
             raise ValueError("No valid faces detected")
         # compute the (x, y)-coordinates of the bounding box for the
         # object

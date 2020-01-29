@@ -83,18 +83,19 @@ def filterImages(images):
 
     return np.expand_dims(fil_img, axis=2)
 
-def plotImages(batch_data, n_images=(4, 4), gray=True):
+def plotImages(batch_data, n_images=(4, 4), gray=True ):
     fig, axes = plt.subplots(n_images[0], n_images[1], figsize=(12, 12))
+    facesdb_labels=['anger', 'disgust', 'fear', 'happiness', 'neutral', 'sadness', 'surprise']
     axes = axes.flatten()
-    images = batch_data[0].astype(np.uint8)
-    for n, ax in zip(range(16), axes):
+    images = batch_data[0]#.astype(np.uint8)
+    for n, ax in zip(range(n_images[0]*n_images[1]), axes):
         img = images[n, :, :, :]
         if gray:
             ax.imshow(np.squeeze(img, axis=2), cmap='gray', vmin=-1, vmax=1)
-        else: ax.imshow(img, vmin=-3, vmax=3)#cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        else: ax.imshow(img.astype(np.uint8), vmin=-3, vmax=3)#cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         ax.set_xticks(())
         ax.set_yticks(())
-        ax.set_title(batch_data[1][n])
+        ax.set_title(facesdb_labels[np.argmax(batch_data[1][n])])
     plt.tight_layout()
     plt.show()
 
