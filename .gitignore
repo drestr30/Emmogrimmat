@@ -3,3 +3,4 @@ __pycache__
 .idea/
 *.jpg
 *.png
+saved_models/
