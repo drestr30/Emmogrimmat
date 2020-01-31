@@ -21,7 +21,6 @@ class Batch_logger(Callback):
         self.val_losses.append(logs.get('val_loss'))
         self.val_accuracy.append(logs.get('val_acc'))
 
-
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',

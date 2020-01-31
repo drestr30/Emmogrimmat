@@ -23,68 +23,7 @@ import itertools
 from keras.utils.vis_utils import plot_model
 import os
 import cv2
-
-
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
-
-    print(cm)
-
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-
-
-def resize_img(img, shape):
-    new_img = scipy.misc.imresize(img, shape)
-    return new_img
-
-def filterImages(images):
-
-    # fil_images = np.empty(np.shape(images))
-
-    # for n, image in zip(range(np.shape(images)[0]),images):
-    #     fil_images[n,:,:,:] = image
-    image = np.squeeze(images, axis=2)
-    height, width = np.shape(image)
-    kernel = laguerre_gauss_filter(height, width, 0.3)
-    lenna_fourier = fourier_transform(image)
-    kernel_fourier = fourier_transform(kernel)
-
-    out = np.multiply(kernel_fourier, lenna_fourier)
-    out = np.abs(inverse_fourier_transform(out))
-
-    fil_img = out / out.max()  # normalize the data to 0 - 1
-    fil_img = 255 * fil_img  # Now scal by 255
-    fil_img = fil_img.astype(np.uint8)
-        # fil_images[n,:,:,0] = fil_img
-
-    return np.expand_dims(fil_img, axis=2)
+from Utils import plot_confusion_matrix, resize_img, filterImages, balance, fix_labels
 
 def plotImages(batch_data, n_images=(4, 4)):
     fig, axes = plt.subplots(n_images[0], n_images[1], figsize=(12, 12))
@@ -99,47 +38,6 @@ def plotImages(batch_data, n_images=(4, 4)):
         ax.set_title(batch_data[1][n])
     plt.tight_layout()
     plt.show()
-
-def balance(faces, emotions, num):
-    unique, counts = np.unique(emotions, return_counts=True)
-    print(dict(zip(unique, counts)))
-    emotions_id =emotions # np.argmax(emotions, axis=1)
-
-    index_list = list()
-    for i in unique:
-        index = np.where(emotions_id == i)[0]
-        if np.shape(index)[0] > num:
-            if i == 6:  ### special balance for any class
-                index_list.append(index[num:])
-            else:
-                index_list.append(index[num:])
-
-    index_4_delete = np.concatenate(index_list)
-
-    balanced_faces = np.delete(faces,index_4_delete, axis=0)
-    balanced_emotions = np.delete(emotions,index_4_delete, axis=0)
-
-    # balanced_emotions = np.where(balanced_emotions == 4, 3, balanced_emotions)
-    # balanced_emotions = np.where(balanced_emotions == 6, 4, balanced_emotions)
-
-    unique, counts = np.unique(balanced_emotions, return_counts=True)
-    print(dict(zip(unique, counts)))
-    return balanced_faces, balanced_emotions
-
-def fix_labels(emotions):
-    new_labels = []
-    for emotion in emotions:
-        if emotion == 0:
-            new_labels.append(emotion+5)
-        elif emotion == 5:
-            new_labels.append(emotion - 5)
-        elif emotion == 1:
-            new_labels.append(emotion +1)
-        elif emotion == 2:
-            new_labels.append(emotion-1)
-        else:
-            new_labels.append(emotion)
-    return new_labels
 
 dataset_path = "/home/fourier/Documentos/Datasets_emociones/"
 
@@ -197,7 +95,6 @@ def preprocess_input(x, v2=True):
         x = x * 2.0
     return x
 # parameters
-
 #
 # dataset = "facesDB"
 # # #
@@ -205,7 +102,6 @@ def preprocess_input(x, v2=True):
 # val_root = "/home/fourier/Documentos/Datasets_emociones/{}/validation".format(dataset)
 # test_root = "/home/fourier/Documentos/Datasets_emociones/{}/test".format(dataset)
 #
-
 batch_size = 32
 num_epochs = 5
 input_shape = (100, 100, 1)
