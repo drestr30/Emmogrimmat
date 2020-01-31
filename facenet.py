@@ -11,8 +11,6 @@ from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import numpy as np
 import detection
-import cv2 as cv
-import preprocess_crop
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.inception_v3 import preprocess_input
 
@@ -125,7 +123,7 @@ patience = 3
 face_detector = detection.Detection()
 face_detector.load_CNN_detector()
 
-image_data, val_data = get_ferg_generators()
+image_data, val_data = get_croppedfaces_generators()
 
 ## Check if batch info is OK.
 
